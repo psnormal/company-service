@@ -6,8 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>company_service</RootNamespace>
     <UserSecretsId>87ed4515-4012-4baa-b0ca-78e1c4a4d597</UserSecretsId>
-    <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+	<InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
