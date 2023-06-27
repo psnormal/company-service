@@ -48,6 +48,22 @@ namespace company_service.Services
             return result;
         }
 
+        public CompanyNameDto GetCompanyName(int id)
+        {
+            var companyInfo = _context.Сompanies.FirstOrDefault(c => c.CompanyId == id);
+
+            if (companyInfo == null)
+            {
+                throw new ValidationException("This company does not exist");
+            }
+
+            CompanyNameDto result = new CompanyNameDto
+            {
+                CompanyName = companyInfo.CompanyName
+            };
+            return result;
+        }
+
         public AllCompaniesDto GetAllCompanies()
         {
             List<Company> companies = _context.Сompanies.ToList();
