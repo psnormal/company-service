@@ -82,6 +82,33 @@ namespace company_service.Controllers
         }
 
         [HttpGet]
+        [Route("company/allApplications/{id}")]
+        public async Task<ActionResult<ApplicationsDto>> GetCompanyAllApplications([FromHeader(Name = "Authorization")] string Authorization, int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return await _companyService.GetCompanyAllApplications(Authorization, id);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This company does not exist")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                if (ex.Message == "This info does not exist")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+        [HttpGet]
         [Route("companies")]
         public ActionResult<AllCompaniesDto> GetAllCompanies()
         {

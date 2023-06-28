@@ -15,5 +15,6 @@ namespace company_service.DTO
         [Required]
         public string IntershipPositionName { get; set; }
         public int IntershipPositionCount { get; set; }
+        public int IntershipApplicationsCount { get; set; }
     }
 }

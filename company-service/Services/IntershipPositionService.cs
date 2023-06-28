@@ -1,5 +1,7 @@
 ﻿using company_service.DTO;
 using company_service.Models;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace company_service.Services
@@ -59,7 +61,7 @@ namespace company_service.Services
             return result;
         }
 
-        public IntershipPositionsDto GetAllIntershipPositions()
+        public async Task<IntershipPositionsDto> GetAllIntershipPositions(string token)
         {
             List<IntershipPosition> allPositions = _context.IntershipPositions.ToList();
             List<IntershipPositionInfoDto> intershipPositionInfoDtos = new List<IntershipPositionInfoDto>();
@@ -72,7 +74,8 @@ namespace company_service.Services
                     CompanyId = position.CompanyId,
                     IntershipPositionName = position.IntershipPositionName,
                     IntershipPositionCount = position.IntershipPositionCount,
-                    CompanyName = company.CompanyName
+                    CompanyName = company.CompanyName,
+                    IntershipApplicationsCount = await GetCountOfApplications(token, position.IntershipPositionId)
                 };
                 intershipPositionInfoDtos.Add(newPos);
             }
@@ -80,7 +83,7 @@ namespace company_service.Services
             return result;
         }
 
-        public IntershipPositionsDto GetAllIntershipPositionsByCompany(int id)
+        public async Task<IntershipPositionsDto> GetAllIntershipPositionsByCompany(string token, int id)
         {
             var companyInfo = _context.Сompanies.FirstOrDefault(c => c.CompanyId == id);
 
@@ -100,7 +103,8 @@ namespace company_service.Services
                     CompanyId = position.CompanyId,
                     IntershipPositionName = position.IntershipPositionName,
                     IntershipPositionCount = position.IntershipPositionCount,
-                    CompanyName = company.CompanyName
+                    CompanyName = company.CompanyName,
+                    IntershipApplicationsCount = await GetCountOfApplications(token, position.IntershipPositionId)
                 };
                 intershipPositionInfoDtos.Add(newPos);
             }
@@ -135,6 +139,33 @@ namespace company_service.Services
 
             _context.IntershipPositions.Remove(positionInfo);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task<int> GetCountOfApplications(string token, Guid id)
+        {
+            var client = new HttpClient();
+            var baseUrl = "https://hits-application-service.onrender.com/api/applications/position/";
+            var urlId = id.ToString();
+            var url = baseUrl + urlId;
+            client.DefaultRequestHeaders.Add("Authorization", token);
+
+            List<ApplicationDto> applications = new List<ApplicationDto>();
+
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                var application = JsonConvert.DeserializeObject<List<ApplicationDto>>(jsonString);
+                foreach (var a in application)
+                {
+                    applications.Add(a);
+                }
+            }
+            else
+            {
+                throw new ValidationException("This info does not exist");
+            }
+            return applications.Count;
         }
     }
 }

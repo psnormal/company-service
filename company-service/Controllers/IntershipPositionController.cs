@@ -1,6 +1,7 @@
 ﻿using company_service.DTO;
 using company_service.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace company_service.Controllers
 {
@@ -63,11 +64,11 @@ namespace company_service.Controllers
 
         [HttpGet]
         [Route("intershipPositions")]
-        public ActionResult<IntershipPositionsDto> GetAllIntershipPositions()
+        public async Task<ActionResult<IntershipPositionsDto>> GetAllIntershipPositions([FromHeader(Name = "Authorization")] string Authorization)
         {
             try
             {
-                return _intershipPositionService.GetAllIntershipPositions();
+                return await _intershipPositionService.GetAllIntershipPositions(Authorization);
             }
             catch (Exception ex)
             {
@@ -77,7 +78,7 @@ namespace company_service.Controllers
 
         [HttpGet]
         [Route("company/{id}/intershipPositions")]
-        public ActionResult<IntershipPositionsDto> GetAllIntershipPositionsByCompany(int id)
+        public async Task<ActionResult<IntershipPositionsDto>> GetAllIntershipPositionsByCompany([FromHeader(Name = "Authorization")] string Authorization, int id)
         {
             if (!ModelState.IsValid)
             {
@@ -86,7 +87,7 @@ namespace company_service.Controllers
 
             try
             {
-                return _intershipPositionService.GetAllIntershipPositionsByCompany(id);
+                return await _intershipPositionService.GetAllIntershipPositionsByCompany(Authorization, id);
             }
             catch (Exception ex)
             {

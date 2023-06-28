@@ -7,8 +7,8 @@ namespace company_service.Services
     {
         Task<Guid> CreateIntershipPosition(IntershipPositionCreateUpdateDto model);
         IntershipPositionPageDto GetIntershipPositionPageInfo(Guid id);
-        IntershipPositionsDto GetAllIntershipPositions();
-        IntershipPositionsDto GetAllIntershipPositionsByCompany(int id);
+        Task<IntershipPositionsDto> GetAllIntershipPositions(string token);
+        Task<IntershipPositionsDto> GetAllIntershipPositionsByCompany(string token, int id);
         Task EditIntershipPosition(Guid id, IntershipPositionCreateUpdateDto model);
         Task DeleteIntershipPosition(Guid id);
     }
