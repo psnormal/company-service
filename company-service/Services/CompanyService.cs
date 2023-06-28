@@ -98,6 +98,24 @@ namespace company_service.Services
                     var application = JsonConvert.DeserializeObject<List<ApplicationDto>>(jsonString);
                     foreach (var a in application)
                     {
+                        var intershipPos = _context.IntershipPositions.FirstOrDefault(c => c.IntershipPositionId.ToString() == a.positionId);
+                        a.IntershipPositionName = intershipPos.IntershipPositionName;
+
+                        var url2 = "https://hits-user-service.onrender.com/api/users/id/" + a.studentId;
+                        var response2 = await client.GetAsync(url2);
+                        if (response2.IsSuccessStatusCode)
+                        {
+                            var jsonString2 = await response2.Content.ReadAsStringAsync();
+                            var user = JsonConvert.DeserializeObject<UserDto>(jsonString2);
+
+                            a.firstName = user.firstName; a.lastName = user.lastName; a.patronym = user.patronym;
+                        }
+                        else
+                        {
+                            //Console.WriteLine(response.StatusCode);
+                            throw new ValidationException("This info does not exist");
+                        }
+
                         applications.Add(a);
                     }
                 }

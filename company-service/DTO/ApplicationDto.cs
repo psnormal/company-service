@@ -14,5 +14,9 @@ namespace company_service.DTO
         public List<InterviewDto> interview { get; set; }
         [Required]
         public string studentId { get; set; }
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+        public string patronym { get; set; }
+        public string IntershipPositionName { get; set; }
     }
 }
