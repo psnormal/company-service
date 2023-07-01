@@ -1,6 +1,7 @@
 ﻿using company_service.DTO;
 using company_service.Models;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Headers;
 using System.Text.Json.Serialization;
@@ -127,6 +128,61 @@ namespace company_service.Services
             }
 
             ApplicationsDto result = new ApplicationsDto(applications);
+            return result;
+        }
+
+        public async Task<List<StudentAndWorkPlaceDto>> GetStudentsInCompany(string token, int id)
+        {
+            var companyInfo = _context.Сompanies.FirstOrDefault(c => c.CompanyId == id);
+
+            if (companyInfo == null)
+            {
+                throw new ValidationException("This company does not exist");
+            }
+
+            var client = new HttpClient();
+            var url = "https://practice-service.onrender.com/api/company/" + id.ToString() + "/workPlaceInfo";
+
+            List<StudentAndWorkPlaceDto> result = new List<StudentAndWorkPlaceDto>();
+
+            var response = await client.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonString = await response.Content.ReadAsStringAsync();
+                var works = JsonConvert.DeserializeObject<List<WorkPlaceInfoDto>>(jsonString);
+
+                client.DefaultRequestHeaders.Add("Authorization", token);
+                foreach (var work in works)
+                {
+                    var url2 = "https://hits-user-service.onrender.com/api/users/id/" + work.UserId;
+                    var response2 = await client.GetAsync(url2);
+                    if (response2.IsSuccessStatusCode)
+                    {
+                        var jsonString2 = await response2.Content.ReadAsStringAsync();
+                        var user = JsonConvert.DeserializeObject<UserDto>(jsonString2);
+
+                        StudentAndWorkPlaceDto sw = new StudentAndWorkPlaceDto
+                        {
+                            firstName = user.firstName,
+                            lastName = user.lastName,
+                            groupNumber = user.groupNumber,
+                            patronym = user.patronym,
+                            Position = work.Position,
+                            userId = work.UserId.ToString()
+                        };
+
+                        result.Add(sw);
+                    }
+                    else
+                    {
+                        throw new ValidationException("This info does not exist");
+                    }
+                }
+            }
+            else
+            {
+                throw new ValidationException("This info does not exist");
+            }
             return result;
         }
 

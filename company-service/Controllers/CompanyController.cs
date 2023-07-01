@@ -109,6 +109,33 @@ namespace company_service.Controllers
         }
 
         [HttpGet]
+        [Route("company/{id}/students")]
+        public async Task<ActionResult<List<StudentAndWorkPlaceDto>>> GetStudentsInCompany([FromHeader(Name = "Authorization")] string Authorization, int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                return await _companyService.GetStudentsInCompany(Authorization, id);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "This company does not exist")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                if (ex.Message == "This info does not exist")
+                {
+                    return StatusCode(400, ex.Message);
+                }
+                return StatusCode(500, "Something went wrong");
+            }
+        }
+
+        [HttpGet]
         [Route("companies")]
         public ActionResult<AllCompaniesDto> GetAllCompanies()
         {
